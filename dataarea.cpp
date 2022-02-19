@@ -42,6 +42,8 @@ DataArea::DataArea(QWidget *parent)
 
     connect(m_data->editor, SIGNAL(mouseWheelValue(int)), this, SLOT(mouseWheelValue(int)));
     connect(m_data->editor, SIGNAL(updateColumnDetails(QList<ColumnDetail>)), m_data->tableTitle, SLOT(setColumnDetails(QList<ColumnDetail>)));
+
+    connect(m_data->editor, SIGNAL(clearQuickFilter()), this, SLOT(clearQuickFilter()));
 }
 
 DataArea::~DataArea()
@@ -70,6 +72,11 @@ void DataArea::mouseWheelValue(int value)
 void DataArea::filterTextChanged(const QString& text)
 {
     m_data->editor->showQuickFiltered(text.trimmed());
+}
+
+void DataArea::clearQuickFilter()
+{
+    m_data->quickFilter->clear();
 }
 
 void DataArea::save()

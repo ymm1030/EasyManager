@@ -37,6 +37,7 @@ signals:
     void barValueChanged(int hvalue, int vvalue);
     void mouseWheelValue(int value);
     void updateColumnDetails(QList<ColumnDetail>);
+    void clearQuickFilter();
 
 public slots:
     void dataChanged();

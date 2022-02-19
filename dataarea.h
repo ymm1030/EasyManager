@@ -33,6 +33,7 @@ public slots:
     void requestInsert(const NamedDataList& data);
     void mouseWheelValue(int value);
     void filterTextChanged(const QString& text);
+    void clearQuickFilter();
 
 protected:
     void resizeEvent(QResizeEvent *) override;

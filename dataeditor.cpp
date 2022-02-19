@@ -43,9 +43,12 @@ public:
 
     bool                redBrushForUnchangedStock;
     bool                dragStart;
+    bool                quickFilterClearing;
 
     int                 dragSourceIndex;
     int                 dragTargetIndex;
+
+    QString             quickFilterString;
 };
 
 DataEditor::DataEditor(QWidget *parent)
@@ -59,6 +62,7 @@ DataEditor::DataEditor(QWidget *parent)
     m_data->currentInserting = -1;
     m_data->redBrushForUnchangedStock = false;
     m_data->dragStart = false;
+    m_data->quickFilterClearing = false;
     m_data->primeFilterType = 0;
     connect(&m_data->data, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
 
@@ -98,8 +102,6 @@ void DataEditor::dataChanged()
 //    m_data->v_position = 0;
 //    m_data->h_position = 0;
     m_data->currentSelected = -1;
-
-    resetBarValues();
     update();
 }
 
@@ -155,9 +157,11 @@ void DataEditor::requestAddNew(const NamedDataList& data)
 {
     if (m_data->currentInserting) {
         NamedDataList d1 = m_data->dataShown.at(m_data->currentInserting);
+        qDebug() << "insert!";
         m_data->data.insert(d1, data);
     }
     else {
+        qDebug() << "add";
         m_data->data.add(data);
     }
 }
@@ -166,8 +170,14 @@ void DataEditor::requestFilterRefresh(const Filter& filter)
 {
     m_data->primeFilterType = 0;
     m_data->filter = filter;
+
+    if (filter.isValid()) {
+        m_data->quickFilterClearing = true;
+        emit clearQuickFilter();
+        m_data->quickFilterClearing = false;
+    }
+
     refreshShownData();
-    resetBarValues();
 }
 
 void DataEditor::requestUpdateLuluPrice(const QMap<QString, QString>& prices, const QList<NamedDataList>& data, const QMap<QString, QString>& changedShippingMap)
@@ -180,7 +190,6 @@ void DataEditor::setStockComparingDays(int days, bool redBrushForUnchangedStock)
     m_data->redBrushForUnchangedStock = redBrushForUnchangedStock;
     m_data->data.setStockComparingDays(days);
     refreshShownData();
-    resetBarValues();
     emit updateColumnDetails(m_data->data.columnDetails());
 }
 
@@ -204,7 +213,6 @@ void DataEditor::readStockData()
 {
     m_data->data.readStockData();
     refreshShownData();
-    resetBarValues();
     update();
 }
 
@@ -309,7 +317,6 @@ void DataEditor::startCheckPrice()
             this, SLOT(requestUpdateLuluPrice(QMap<QString, QString>, QList<NamedDataList>, QMap<QString, QString>)));
     pop.exec();
     refreshShownData();
-    resetBarValues();
     update();
 }
 
@@ -352,14 +359,13 @@ void DataEditor::openStockComparingSetting()
 
 void DataEditor::showQuickFiltered(const QString &content)
 {
-    if (content.isEmpty()) {
-        m_data->dataShown = m_data->data.allData();
+    m_data->quickFilterString = content;
+
+    if (m_data->quickFilterClearing) {
+        return;
     }
-    else {
-        m_data->dataShown = m_data->data.quickFilteredData(content);
-    }
-    resetBarValues();
-    update();
+
+    refreshShownData();
 }
 
 void DataEditor::paintEvent(QPaintEvent *)
@@ -679,32 +685,39 @@ void DataEditor::openModifyPopUp()
 
 void DataEditor::refreshShownData()
 {
-    if (m_data->primeFilterType == ShowLuluPriceLessThan10) {
-        filterLuluPriceSpread(false);
-        return;
-    }
-    else if (m_data->primeFilterType == ShowLuluPriceGreaterThan10) {
-        filterLuluPriceSpread(true);
-        return;
-    }
-    else if (m_data->primeFilterType == ShowChangedPrice) {
-        showPriceChangedData();
-        return;
-    }
-    else if (m_data->primeFilterType == ShowChangedShipping) {
-        showShippingChangedData();
-        return;
-    }
-    else if (m_data->primeFilterType == ShowNoBarCode) {
-        showWithoutBarcodeData();
-        return;
-    }
-
-    if (m_data->filter.isValid()) {
-        m_data->dataShown = m_data->data.filteredData(m_data->filter);
+    if (!m_data->quickFilterString.isEmpty()) {
+        m_data->dataShown = m_data->data.quickFilteredData(m_data->quickFilterString);
     }
     else {
-        m_data->dataShown = m_data->data.allData();
+        if (m_data->primeFilterType == ShowLuluPriceLessThan10) {
+            filterLuluPriceSpread(false);
+            return;
+        }
+        else if (m_data->primeFilterType == ShowLuluPriceGreaterThan10) {
+            filterLuluPriceSpread(true);
+            return;
+        }
+        else if (m_data->primeFilterType == ShowChangedPrice) {
+            showPriceChangedData();
+            return;
+        }
+        else if (m_data->primeFilterType == ShowChangedShipping) {
+            showShippingChangedData();
+            return;
+        }
+        else if (m_data->primeFilterType == ShowNoBarCode) {
+            showWithoutBarcodeData();
+            return;
+        }
+
+        if (m_data->filter.isValid()) {
+            m_data->dataShown = m_data->data.filteredData(m_data->filter);
+        }
+        else {
+            m_data->dataShown = m_data->data.allData();
+        }
     }
+
+    resetBarValues();
     update();
 }
