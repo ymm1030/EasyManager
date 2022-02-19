@@ -155,13 +155,11 @@ void DataEditor::requestUpdate(const NamedDataList& data)
 
 void DataEditor::requestAddNew(const NamedDataList& data)
 {
-    if (m_data->currentInserting) {
+    if (-1 != m_data->currentInserting) {
         NamedDataList d1 = m_data->dataShown.at(m_data->currentInserting);
-        qDebug() << "insert!";
         m_data->data.insert(d1, data);
     }
     else {
-        qDebug() << "add";
         m_data->data.add(data);
     }
 }

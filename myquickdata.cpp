@@ -11,6 +11,8 @@
 #include "dataeditor.h"
 #include "basedefine.h"
 
+MyQuickData* MyQuickData::s_instance = nullptr;
+
 class PrivateMyQuickData
 {
 public:
@@ -31,6 +33,9 @@ MyQuickData::MyQuickData(QObject* parent)
     : QObject(parent)
     , m_data(new PrivateMyQuickData)
 {
+    Q_ASSERT(s_instance == nullptr);
+    s_instance = this;
+
     m_data->names << "免税品"
                   << "分类/品牌"
                   << "商品ID"
@@ -63,6 +68,7 @@ MyQuickData::MyQuickData(QObject* parent)
 MyQuickData::~MyQuickData()
 {
     delete m_data;
+    s_instance = nullptr;
 }
 
 const QList<NamedDataList>& MyQuickData::allData() const
@@ -724,6 +730,17 @@ void MyQuickData::moveAfter(const NamedDataList &source, const NamedDataList &ta
     }
 
     emit dataChanged();
+}
+
+bool MyQuickData::exist(const QString &name) const
+{
+    for (int i = 0;  i < m_data->data.size(); ++i) {
+        QString n = m_data->data.at(i).at(3).data.toString();
+        if (name == n) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void MyQuickData::readStockData()

@@ -9,6 +9,7 @@
 #include <QDebug>
 #include "modifypopup.h"
 #include "basedefine.h"
+#include "myquickdata.h"
 
 class PrivateModifyPopUp
 {
@@ -257,6 +258,12 @@ void ModifyPopUp::okClicked()
 {
     if (m_data->nameInput->text().isEmpty()) {
         QMessageBox::warning(nullptr, "错误", "名称不能为空！");
+        return;
+    }
+
+    QString name = m_data->nameInput->text().trimmed();
+    if (MyQuickData::instance()->exist(name)) {
+        QMessageBox::warning(nullptr, "错误", "已经存在该名称的货品！");
         return;
     }
 

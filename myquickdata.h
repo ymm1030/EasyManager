@@ -61,6 +61,8 @@ public:
     MyQuickData(QObject* parent = nullptr);
     ~MyQuickData();
 
+    static MyQuickData* instance() { return s_instance; }
+
     const QList<NamedDataList>& allData() const;
     QList<NamedDataList> filteredData(const Filter& filter) const;
     QList<NamedDataList> quickFilteredData(const QString& content) const;
@@ -81,6 +83,8 @@ public:
     void insert(const NamedDataList& current, const NamedDataList& newData);
     void moveBefore(const NamedDataList& source, const NamedDataList& target);
     void moveAfter(const NamedDataList& source, const NamedDataList& target);
+
+    bool exist(const QString& name) const;
 
     void readStockData();
 
@@ -109,6 +113,7 @@ private:
 
 private:
     PrivateMyQuickData*       m_data;
+    static MyQuickData*       s_instance;
 };
 
 #endif // MYQUICKDATA_H
