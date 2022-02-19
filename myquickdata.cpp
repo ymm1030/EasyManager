@@ -248,6 +248,24 @@ QList<NamedDataList> MyQuickData::filteredData(const Filter& filter) const
     return result;
 }
 
+QList<NamedDataList> MyQuickData::quickFilteredData(const QString& content) const
+{
+    QList<NamedDataList> result;
+    QString c = content.toLower();
+    for (int i = 0; i < m_data->data.size(); ++i) {
+        NamedDataList d = m_data->data.at(i);
+        QString brand = d.at(1).data.toString().toLower();
+        QString tbId = d.at(2).data.toString().toLower();
+        QString name = d.at(3).data.toString().toLower();
+        QString barcode = d.at(7).data.toString().toLower();
+
+        if (brand.contains(c) || tbId.contains(c) || name.contains(c) || barcode.contains(c)) {
+            result << d;
+        }
+    }
+    return result;
+}
+
 const NamedDataList& MyQuickData::lastRecord() const
 {
     return m_data->lastRecord;

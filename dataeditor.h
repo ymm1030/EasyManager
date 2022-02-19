@@ -18,7 +18,7 @@ public:
 
     void save();
     void readStockData();
-    void addNew();
+    void addNew(bool isBlank = true);
     void openFilter();
     void clearFilter();
     void openLuluFilter();
@@ -30,6 +30,8 @@ public:
 
     void filterLuluPriceSpread(bool over10);
     void openStockComparingSetting();
+
+    void showQuickFiltered(const QString& content);
 
 signals:
     void barValueChanged(int hvalue, int vvalue);

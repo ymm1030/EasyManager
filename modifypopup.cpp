@@ -43,7 +43,7 @@ public:
 
     QPushButton*    okBtn;
     QPushButton*    cancelBtn;
-    QPushButton*    copyLastBtn;
+//    QPushButton*    copyLastBtn;
 
     NamedDataList   data;
     NamedDataList   lastRecord;
@@ -163,12 +163,12 @@ ModifyPopUp::ModifyPopUp(QWidget* parent)
     m_data->okBtn->setText("确定");
     m_data->cancelBtn = new QPushButton(this);
     m_data->cancelBtn->setText("取消");
-    m_data->copyLastBtn = new QPushButton(this);
-    m_data->copyLastBtn->setText("复制上一条");
+//    m_data->copyLastBtn = new QPushButton(this);
+//    m_data->copyLastBtn->setText("复制上一条");
     QHBoxLayout* lastLayout = new QHBoxLayout;
     lastLayout->addWidget(m_data->okBtn);
     lastLayout->addWidget(m_data->cancelBtn);
-    lastLayout->addWidget(m_data->copyLastBtn);
+//    lastLayout->addWidget(m_data->copyLastBtn);
 
     layout->addLayout(taxfreeLayout);
     layout->addLayout(brandLayout);
@@ -189,7 +189,7 @@ ModifyPopUp::ModifyPopUp(QWidget* parent)
 
     connect(m_data->okBtn, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(m_data->cancelBtn, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(m_data->copyLastBtn, SIGNAL(clicked()), this, SLOT(copyLastClicked()));
+//    connect(m_data->copyLastBtn, SIGNAL(clicked()), this, SLOT(copyLastClicked()));
     connect(m_data->renameBtn, SIGNAL(clicked()), this, SLOT(renameClicked()));
 
     {
@@ -227,6 +227,7 @@ void ModifyPopUp::showPopUp(QStringList brands, const NamedDataList& lastRecord)
 //    m_data->luluHasCombo->setCurrentText("否");
 
     m_data->brandInput->addItems(brands);
+    copyLastClicked();
 
     m_data->cancelBtn->setFocus();
 }

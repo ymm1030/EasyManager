@@ -32,6 +32,7 @@ public slots:
     void barValueChanged(int hvalue, int vvalue);
     void requestInsert(const NamedDataList& data);
     void mouseWheelValue(int value);
+    void filterTextChanged(const QString& text);
 
 protected:
     void resizeEvent(QResizeEvent *) override;

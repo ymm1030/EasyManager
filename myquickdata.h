@@ -63,6 +63,7 @@ public:
 
     const QList<NamedDataList>& allData() const;
     QList<NamedDataList> filteredData(const Filter& filter) const;
+    QList<NamedDataList> quickFilteredData(const QString& content) const;
     const NamedDataList& lastRecord() const;
     QList<NamedDataList> priceChangedData() const;
     QList<NamedDataList> shippingChangedData() const;

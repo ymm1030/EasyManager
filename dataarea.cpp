@@ -1,5 +1,6 @@
 #include <QScrollBar>
 #include <QDebug>
+#include <QLineEdit>
 #include "dataarea.h"
 #include "dataeditor.h"
 #include "tabletitle.h"
@@ -11,6 +12,7 @@ public:
     QScrollBar*     hbar;
     QScrollBar*     vbar;
     TableTitle*     tableTitle;
+    QLineEdit*      quickFilter;
 };
 
 DataArea::DataArea(QWidget *parent)
@@ -34,6 +36,9 @@ DataArea::DataArea(QWidget *parent)
     m_data->tableTitle = new TableTitle(this);
     m_data->tableTitle->setColumnDetails(m_data->editor->columnDetails());
     connect(m_data->hbar, SIGNAL(valueChanged(int)), m_data->tableTitle, SLOT(hvalueChanged(int)));
+
+    m_data->quickFilter = new QLineEdit(this);
+    connect(m_data->quickFilter, SIGNAL(textChanged(QString)), this ,SLOT(filterTextChanged(QString)));
 
     connect(m_data->editor, SIGNAL(mouseWheelValue(int)), this, SLOT(mouseWheelValue(int)));
     connect(m_data->editor, SIGNAL(updateColumnDetails(QList<ColumnDetail>)), m_data->tableTitle, SLOT(setColumnDetails(QList<ColumnDetail>)));
@@ -60,6 +65,11 @@ void DataArea::requestInsert(const NamedDataList& data)
 void DataArea::mouseWheelValue(int value)
 {
     m_data->vbar->setValue(m_data->vbar->value() + value);
+}
+
+void DataArea::filterTextChanged(const QString& text)
+{
+    m_data->editor->showQuickFiltered(text.trimmed());
 }
 
 void DataArea::save()
@@ -129,8 +139,9 @@ void DataArea::openStockComparingSetting()
 
 void DataArea::resizeEvent(QResizeEvent *)
 {
-    m_data->tableTitle->setGeometry(0, 0, width() - 20, 30);
-    m_data->editor->setGeometry(0, 30, width() - 20, height() - 20 - 30);
+    m_data->quickFilter->setGeometry(10, 5, width() - 40, 20);
+    m_data->tableTitle->setGeometry(0, 30, width() - 20, 30);
+    m_data->editor->setGeometry(0, 60, width() - 20, height() - 20 - 30);
     m_data->vbar->setGeometry(width() - 20, 0, 20, height());
     m_data->hbar->setGeometry(0, height() - 20, width(), 20);
 }

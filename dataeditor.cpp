@@ -63,9 +63,10 @@ DataEditor::DataEditor(QWidget *parent)
     connect(&m_data->data, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
 
     m_data->contextMenu = new QMenu;
-    m_data->contextMenu->addAction("复制");
+    m_data->contextMenu->addAction("复制单元格内容");
     m_data->contextMenu->addAction("修改");
-    m_data->contextMenu->addAction("插入(下方)");
+    m_data->contextMenu->addAction("空白插入(下方)");
+    m_data->contextMenu->addAction("复制本条插入(下方)");
     m_data->contextMenu->addAction("删除");
 
     connect(m_data->contextMenu, SIGNAL(triggered(QAction*)), this, SLOT(menuTriggered(QAction*)));
@@ -128,12 +129,17 @@ void DataEditor::menuTriggered(QAction* action)
     else if (action->text() == "修改") {
         openModifyPopUp();
     }
-    else if (action->text() == "插入(下方)") {
+    else if (action->text() == "空白插入(下方)") {
         m_data->currentInserting = m_data->currentSelected;
         addNew();
         m_data->currentInserting = -1;
     }
-    else if (action->text() == "复制") {
+    else if (action->text() == "复制本条插入(下方)") {
+        m_data->currentInserting = m_data->currentSelected;
+        addNew(false);
+        m_data->currentInserting = -1;
+    }
+    else if (action->text() == "复制单元格内容") {
         QApplication::clipboard()->setText(m_data->currentCellString);
     }
 }
@@ -202,12 +208,18 @@ void DataEditor::readStockData()
     update();
 }
 
-void DataEditor::addNew()
+void DataEditor::addNew(bool isBlank)
 {
     ModifyPopUp pop;
     pop.setModal(true);
 //    pop.resize(700, 300);
-    pop.showPopUp(m_data->data.brands(), m_data->data.lastRecord());
+
+    NamedDataList d;
+    if (!isBlank && -1 != m_data->currentSelected) {
+        d = m_data->dataShown.at(m_data->currentSelected);
+    }
+
+    pop.showPopUp(m_data->data.brands(), d);
     connect(&pop, SIGNAL(requestUpdate(NamedDataList)), this, SLOT(requestAddNew(NamedDataList)));
     pop.exec();
 }
@@ -336,6 +348,18 @@ void DataEditor::openStockComparingSetting()
     StockComparingSettingPopUp pop;
     connect(&pop, SIGNAL(comparingStockDays(int, bool)), this, SLOT(setStockComparingDays(int, bool)));
     pop.exec();
+}
+
+void DataEditor::showQuickFiltered(const QString &content)
+{
+    if (content.isEmpty()) {
+        m_data->dataShown = m_data->data.allData();
+    }
+    else {
+        m_data->dataShown = m_data->data.quickFilteredData(content);
+    }
+    resetBarValues();
+    update();
 }
 
 void DataEditor::paintEvent(QPaintEvent *)
