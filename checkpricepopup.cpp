@@ -186,7 +186,7 @@ void CheckPricePopUp::makeNextFrame()
         return;
     }
 
-    m_data->showRemainLabel->setText("剩余" + QString::number(m_data->dataMap.size()) + "项");
+    m_data->showRemainLabel->setText("剩余" + QString::number(m_data->dataMap.size() - m_data->backingKeys.size()) + "项");
 
     QString url;
     QStringList names;
@@ -259,10 +259,18 @@ void CheckPricePopUp::makeNextFrame()
                 }
                 priceInput->setText(m_data->data.at(j).at(5).data.toString());
                 QString stockNum = m_data->data.at(j).at(10).data.toString();
-                if (stockNum.isEmpty()) {
-                    stockNum = "0";
+                if (!stockNum.isEmpty()) {
+                    stock->setText("库存:" + stockNum + "  ");
                 }
-                stock->setText("库存:" + stockNum + "  ");
+                else {
+                    QString barcode = m_data->data.at(j).at(7).data.toString();
+                    if (barcode.isEmpty()) {
+                        stock->setText("无条码  ");
+                    }
+                    else {
+                        stock->setText("库存:0  ");
+                    }
+                }
                 break;
             }
         }
